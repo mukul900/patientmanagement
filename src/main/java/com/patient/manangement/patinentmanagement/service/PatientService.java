@@ -1,5 +1,6 @@
 package com.patient.manangement.patinentmanagement.service;
 
+import com.patient.manangement.patinentmanagement.exception.ResourceNotFoundException;
 import com.patient.manangement.patinentmanagement.model.Patient;
 import com.patient.manangement.patinentmanagement.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +21,14 @@ public class PatientService {
     public PatientService(PatientRepository patientRepository){
         this.patientRepository=patientRepository;
     }
-    @Cacheable("patients")
+    @Cacheable(value= "patients", key = "#id")
     public Patient getPatientById(Long id){
         Optional<Patient> optionalPatient = patientRepository.findById( id);
 
         if (optionalPatient.isPresent()) {
             return optionalPatient.get();
         } else {
-            // Patient not found, you can choose to return null or throw an exception
-            // Example: throw new ResourceNotFoundException("Patient not found with ID: " + id);
-            return null;
+            throw new ResourceNotFoundException("Patient not found with ID: " + id);
         }
     }
     public Patient createPatient(Patient patient){
